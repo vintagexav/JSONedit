@@ -2,53 +2,19 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>BuildMachineOSBuild</key>
-	<string>16B2555</string>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>jsonedit</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>webarchive</string>
-			</array>
-			<key>CFBundleTypeName</key>
-			<string>Web archive</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>LSTypeIsPackage</key>
-			<true/>
-			<key>NSDocumentClass</key>
-			<string>FUDocument</string>
-			<key>NSPersistentStoreTypeKey</key>
-			<string>Binary</string>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>webloc</string>
-			</array>
-			<key>CFBundleTypeMIMETypes</key>
-			<array>
-				<string>text/text</string>
-			</array>
-			<key>CFBundleTypeName</key>
-			<string>Web location</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>LINK</string>
-			</array>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
-			<key>NSDocumentClass</key>
-			<string>FUDocument</string>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
 				<string>gif</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>document.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>image/gif</string>
@@ -60,18 +26,16 @@
 				<string>GIFf</string>
 			</array>
 			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>FUDocument</string>
+			<string>Viewer</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>html</string>
 				<string>htm</string>
-				<string>shtml</string>
-				<string>jhtml</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>document.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>text/html</string>
@@ -83,33 +47,31 @@
 				<string>HTML</string>
 			</array>
 			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>LSIsAppleDefaultForType</key>
-			<false/>
-			<key>NSDocumentClass</key>
-			<string>FUDocument</string>
+			<string>Viewer</string>
 		</dict>
 		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>xhtml</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>document.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
-				<string>text/plain</string>
+				<string>text/xhtml</string>
 			</array>
 			<key>CFBundleTypeName</key>
-			<string>HTML document (no extension)</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>TEXT</string>
-			</array>
+			<string>XHTML document</string>
 			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>FUDocument</string>
+			<string>Viewer</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>js</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>document.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>application/x-javascript</string>
@@ -117,9 +79,7 @@
 			<key>CFBundleTypeName</key>
 			<string>JavaScript script</string>
 			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>FUDocument</string>
+			<string>Viewer</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -127,6 +87,8 @@
 				<string>jpg</string>
 				<string>jpeg</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>document.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>image/jpeg</string>
@@ -138,56 +100,67 @@
 				<string>JPEG</string>
 			</array>
 			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>FUDocument</string>
+			<string>Viewer</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>jp2</string>
+				<string>mhtml</string>
+				<string>mht</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>document.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
-				<string>image/jp2</string>
+				<string>multipart/related</string>
+				<string>application/x-mimearchive</string>
+				<string>message/rfc822</string>
 			</array>
 			<key>CFBundleTypeName</key>
-			<string>JPEG 2000 image</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>jp2 </string>
-			</array>
+			<string>MHTML document</string>
 			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>FUDocument</string>
+			<string>Viewer</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>txt</string>
-				<string>text</string>
+				<string>oga</string>
+				<string>ogg</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>document.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
-				<string>text/plain</string>
+				<string>audio/ogg</string>
 			</array>
 			<key>CFBundleTypeName</key>
-			<string>Plain text document</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>TEXT</string>
-			</array>
+			<string>HTML5 Audio (Ogg)</string>
 			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>FUDocument</string>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>ogv</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>document.icns</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>video/ogg</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>HTML5 Video (Ogg)</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>png</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>document.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>image/png</string>
@@ -199,129 +172,108 @@
 				<string>PNGf</string>
 			</array>
 			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>FUDocument</string>
+			<string>Viewer</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>rtf</string>
+				<string>svg</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>document.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
-				<string>application/rtf</string>
+				<string>image/svg+xml</string>
 			</array>
 			<key>CFBundleTypeName</key>
-			<string>Rich Text Format (RTF) document</string>
+			<string>SVG document</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>txt</string>
+				<string>text</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>document.icns</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>text/plain</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Plain text document</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
-				<string>RTF </string>
+				<string>TEXT</string>
 			</array>
 			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>FUDocument</string>
+			<string>Viewer</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>tiff</string>
-				<string>tif</string>
+				<string>webm</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>document.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
-				<string>image/tiff</string>
+				<string>video/webm</string>
 			</array>
 			<key>CFBundleTypeName</key>
-			<string>TIFF image</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>TIFF</string>
-			</array>
+			<string>HTML5 Video (WebM)</string>
 			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>FUDocument</string>
+			<string>Viewer</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>url</string>
+				<string>webp</string>
 			</array>
-			<key>CFBundleTypeName</key>
-			<string>Web site location</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>LINK</string>
-			</array>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>LSIsAppleDefaultForType</key>
-			<false/>
-			<key>NSDocumentClass</key>
-			<string>FUDocument</string>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>ico</string>
-			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>document.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
-				<string>image/x-icon</string>
+				<string>image/webp</string>
 			</array>
 			<key>CFBundleTypeName</key>
-			<string>Windows icon image</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>ICO </string>
-			</array>
+			<string>WebP image</string>
 			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>FUDocument</string>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>org.chromium.extension</string>
+			</array>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>xhtml</string>
-				<string>xhtm</string>
+				<string>pdf</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>document.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
-				<string>application/xhtml+xml</string>
+				<string>application/pdf</string>
 			</array>
 			<key>CFBundleTypeName</key>
-			<string>XHTML document</string>
+			<string>PDF Document</string>
 			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>FUDocument</string>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>xml</string>
-			</array>
-			<key>CFBundleTypeMIMETypes</key>
-			<array>
-				<string>application/xml</string>
-			</array>
-			<key>CFBundleTypeName</key>
-			<string>XML document</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>FUDocument</string>
+			<string>Viewer</string>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
-	<string>FluidApp</string>
+	<string>Epichrome</string>
 	<key>CFBundleIconFile</key>
-	<string>appl.icns</string>
+	<string>app.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.fluidapp.FluidApp.jsonedit</string>
+	<string>org.epichrome.app.jsonedit</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -329,245 +281,24 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.8.6</string>
+	<string>2.1.16</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-	<key>CFBundleSupportedPlatforms</key>
-	<array>
-		<string>MacOSX</string>
-	</array>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLName</key>
-			<string>com.fluidapp.FluidApp</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>http</string>
-				<string>https</string>
-				<string>feed</string>
-				<string>mailto</string>
-			</array>
-		</dict>
-	</array>
 	<key>CFBundleVersion</key>
-	<string>2331</string>
+	<string>2.1.16</string>
 	<key>DTCompiler</key>
 	<string>com.apple.compilers.llvm.clang.1_0</string>
-	<key>DTPlatformBuild</key>
-	<string>8B62</string>
-	<key>DTPlatformVersion</key>
-	<string>GM</string>
-	<key>DTSDKBuild</key>
-	<string>16B2649</string>
-	<key>DTSDKName</key>
-	<string>macosx10.12</string>
-	<key>DTXcode</key>
-	<string>0810</string>
-	<key>DTXcodeBuild</key>
-	<string>8B62</string>
-	<key>LSArchitecturePriority</key>
-	<array>
-		<string>x86_64</string>
-		<string>i386</string>
-	</array>
+	<key>LSFileQuarantineEnabled</key>
+	<true/>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.6.0</string>
-	<key>LSMinimumSystemVersionByArchitecture</key>
-	<dict>
-		<key>i386</key>
-		<string>10.6.0</string>
-		<key>x86_64</key>
-		<string>10.6.0</string>
-	</dict>
-	<key>LSUIElement</key>
-	<false/>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-	</dict>
+	<string>10.9.0</string>
 	<key>NSAppleScriptEnabled</key>
 	<true/>
-	<key>NSMainNibFile</key>
-	<string>FUMainMenu-IndieStore</string>
-	<key>NSPrincipalClass</key>
-	<string>FUApplication</string>
-	<key>NSSupportsSuddenTermination</key>
-	<false/>
-	<key>OFRegistrations</key>
-	<dict>
-		<key>OAPreferenceController</key>
-		<dict>
-			<key>FUAllPlugInPreferences</key>
-			<dict>
-				<key>category</key>
-				<string>Application</string>
-				<key>defaultsDictionary</key>
-				<dict/>
-				<key>icon</key>
-				<string>prefpane_icon_plugins</string>
-				<key>nib</key>
-				<string>FUAllPlugInPreferences</string>
-				<key>ordering</key>
-				<integer>80</integer>
-				<key>shortTitle</key>
-				<string>Panels</string>
-				<key>title</key>
-				<string>Panel</string>
-			</dict>
-			<key>FUAppearancePreferences</key>
-			<dict>
-				<key>category</key>
-				<string>Application</string>
-				<key>defaultsDictionary</key>
-				<dict/>
-				<key>icon</key>
-				<string>prefpane_icon_appearance</string>
-				<key>nib</key>
-				<string>FUAppearancePreferences</string>
-				<key>ordering</key>
-				<integer>20</integer>
-				<key>title</key>
-				<string>Appearance</string>
-			</dict>
-			<key>FUBehaviorPreferences</key>
-			<dict>
-				<key>category</key>
-				<string>Application</string>
-				<key>defaultsDictionary</key>
-				<dict/>
-				<key>icon</key>
-				<string>prefpane_icon_behavior</string>
-				<key>nib</key>
-				<string>FUBehaviorPreferences</string>
-				<key>ordering</key>
-				<integer>23</integer>
-				<key>title</key>
-				<string>Behavior</string>
-			</dict>
-			<key>FUGeneralPreferences</key>
-			<dict>
-				<key>category</key>
-				<string>Application</string>
-				<key>defaultsDictionary</key>
-				<dict/>
-				<key>icon</key>
-				<string>NSPreferencesGeneral</string>
-				<key>nib</key>
-				<string>FUGeneralPreferences</string>
-				<key>ordering</key>
-				<integer>10</integer>
-				<key>title</key>
-				<string>General</string>
-			</dict>
-			<key>FUHandlerPreferences</key>
-			<dict>
-				<key>category</key>
-				<string>Application</string>
-				<key>defaultsDictionary</key>
-				<dict/>
-				<key>icon</key>
-				<string>prefpane_icon_handlers</string>
-				<key>nib</key>
-				<string>FUHandlerPreferences</string>
-				<key>ordering</key>
-				<integer>65</integer>
-				<key>shortTitle</key>
-				<string>URL Handlers</string>
-				<key>title</key>
-				<string>URL Handler</string>
-			</dict>
-			<key>FUSecurityPreferences</key>
-			<dict>
-				<key>category</key>
-				<string>Application</string>
-				<key>defaultsDictionary</key>
-				<dict/>
-				<key>icon</key>
-				<string>prefpane_icon_security</string>
-				<key>nib</key>
-				<string>FUSecurityPreferences</string>
-				<key>ordering</key>
-				<integer>40</integer>
-				<key>title</key>
-				<string>Security</string>
-			</dict>
-			<key>FUShortcutPreferences</key>
-			<dict>
-				<key>category</key>
-				<string>Application</string>
-				<key>defaultsDictionary</key>
-				<dict/>
-				<key>icon</key>
-				<string>prefpane_icon_shortcuts</string>
-				<key>nib</key>
-				<string>FUShortcutPreferences</string>
-				<key>ordering</key>
-				<integer>50</integer>
-				<key>shortTitle</key>
-				<string>Shortcuts</string>
-				<key>title</key>
-				<string>Shortcut</string>
-			</dict>
-			<key>FUTabsPreferences</key>
-			<dict>
-				<key>category</key>
-				<string>Application</string>
-				<key>defaultsDictionary</key>
-				<dict/>
-				<key>icon</key>
-				<string>prefpane_icon_tabs</string>
-				<key>nib</key>
-				<string>FUTabsPreferences</string>
-				<key>ordering</key>
-				<integer>30</integer>
-				<key>shortTitle</key>
-				<string>Tabs</string>
-				<key>title</key>
-				<string>Tab</string>
-			</dict>
-			<key>FUUpdatePreferences</key>
-			<dict>
-				<key>category</key>
-				<string>Application</string>
-				<key>defaultsDictionary</key>
-				<dict/>
-				<key>icon</key>
-				<string>prefpane_icon_update</string>
-				<key>nib</key>
-				<string>FUUpdatePreferences</string>
-				<key>ordering</key>
-				<integer>60</integer>
-				<key>shortTitle</key>
-				<string>Update</string>
-				<key>title</key>
-				<string>Software Update</string>
-			</dict>
-			<key>FUWhitelistPreferences</key>
-			<dict>
-				<key>category</key>
-				<string>Application</string>
-				<key>defaultsDictionary</key>
-				<dict/>
-				<key>icon</key>
-				<string>prefpane_icon_whitelist</string>
-				<key>nib</key>
-				<string>FUWhitelistPreferences</string>
-				<key>ordering</key>
-				<integer>70</integer>
-				<key>shortTitle</key>
-				<string>Whitelist</string>
-				<key>title</key>
-				<string>Whitelist</string>
-			</dict>
-		</dict>
+	<key>NSSupportsAutomaticGraphicsSwitching</key>
+	<true/>
+	<key>NSUserNotificationAlertStyle</key>
+	<string>banner</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
 	</dict>
-	<key>OSAScriptingDefinition</key>
-	<string>FluidApp.sdef</string>
-	<key>SUFeedURL</key>
-	<string>http://fluidapp.com/appcast/fluidapp1.rss</string>
-	<key>SUPublicDSAKeyFile</key>
-	<string>fluid_dsa_pub.pem</string>
-</dict>
 </plist>
