@@ -1,0 +1,5 @@
+CFBundleDisplayName = "jsonedit";
+CFBundleGetInfoString = "Google Chrome 56.0.2924.87, Autorių teisės priklauso „Google Inc.“, 2017 m. Visos teisės saugomos.";
+CFBundleName = "jsonedit";
+NSContactsUsageDescription = "Turėdami išsamią kontaktų informaciją galite greičiau užpildyti formas „Chrome“.";
+NSHumanReadableCopyright = "Autorių teisės priklauso „Google Inc.“, 2017 m. Visos teisės saugomos.";

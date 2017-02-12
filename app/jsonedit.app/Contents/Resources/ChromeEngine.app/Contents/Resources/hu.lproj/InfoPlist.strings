@@ -1,0 +1,5 @@
+CFBundleDisplayName = "jsonedit";
+CFBundleGetInfoString = "Google Chrome 56.0.2924.87, Copyright 2017 Google Inc. Minden jog fenntartva.";
+CFBundleName = "jsonedit";
+NSContactsUsageDescription = "A névjegyek részletei révén gyorsabban kitöltheti az űrlapokat a Chrome-ban.";
+NSHumanReadableCopyright = "Copyright 2017 Google Inc. Minden jog fenntartva.";

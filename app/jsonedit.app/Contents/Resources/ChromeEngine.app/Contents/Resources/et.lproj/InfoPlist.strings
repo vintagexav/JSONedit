@@ -1,0 +1,5 @@
+CFBundleDisplayName = "jsonedit";
+CFBundleGetInfoString = "Google Chrome 56.0.2924.87, Autoriõigus 2017 Google Inc. Kõik õigused on kaitstud.";
+CFBundleName = "jsonedit";
+NSContactsUsageDescription = "Kontaktide üksikasjad aitavad Chrome'is kiiremini vorme täita.";
+NSHumanReadableCopyright = "Autoriõigus 2017 Google Inc. Kõik õigused on kaitstud.";

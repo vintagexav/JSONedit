@@ -1,0 +1,5 @@
+CFBundleDisplayName = "jsonedit";
+CFBundleGetInfoString = "Google Chrome 56.0.2924.87, Copyright Google Inc. 2017. Tous droits réservés.";
+CFBundleName = "jsonedit";
+NSContactsUsageDescription = "Les coordonnées de vos contacts peuvent vous aider à remplir les formulaires plus rapidement dans Chrome.";
+NSHumanReadableCopyright = "Copyright Google Inc. 2017. Tous droits réservés.";

@@ -1,0 +1,5 @@
+CFBundleDisplayName = "jsonedit";
+CFBundleGetInfoString = "Google Chrome 56.0.2924.87, Copyright 2017 Google Inc. Toate drepturile rezervate.";
+CFBundleName = "jsonedit";
+NSContactsUsageDescription = "Detaliile din agendă vă pot ajuta să completați mai rapid formularele în Chrome.";
+NSHumanReadableCopyright = "Copyright 2017 Google Inc. Toate drepturile rezervate.";

@@ -1,0 +1,5 @@
+CFBundleDisplayName = "jsonedit";
+CFBundleGetInfoString = "Google Chrome 56.0.2924.87, Bản quyền 2017 Google Inc. Mọi quyền được bảo lưu.";
+CFBundleName = "jsonedit";
+NSContactsUsageDescription = "Chi tiết từ danh bạ của bạn có thể giúp bạn điền vào biểu mẫu trong Chrome nhanh hơn.";
+NSHumanReadableCopyright = "Bản quyền 2017 Google Inc. Mọi quyền được bảo lưu.";

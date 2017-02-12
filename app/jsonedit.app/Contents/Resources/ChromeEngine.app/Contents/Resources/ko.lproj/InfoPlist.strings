@@ -1,0 +1,5 @@
+CFBundleDisplayName = "jsonedit";
+CFBundleGetInfoString = "Chrome 56.0.2924.87, Copyright 2017 Google Inc. All rights reserved.";
+CFBundleName = "jsonedit";
+NSContactsUsageDescription = "연락처 세부정보를 사용하면 Chrome에서 양식을 더욱 신속하게 작성할 수 있습니다.";
+NSHumanReadableCopyright = "Copyright 2017 Google Inc. All rights reserved.";

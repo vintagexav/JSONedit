@@ -1,0 +1,772 @@
+#!/bin/sh
+#
+#  Epichrome: Run an Epichrome app
+#  Copyright (C) 2016  David Marmor
+#
+#  https://github.com/dmarmor/epichrome
+#
+#  Full license at: http://www.gnu.org/licenses/ (V3,6/29/2007)
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+
+
+# ABORT -- display an error alert and abort
+function abort {
+    alert "$1" "Unable to Run" '|stop'
+    exit $2
+}
+
+# UNSUDO -- run a command as the original user
+function unsudo {
+    if [[ "$isAdmin" ]] ; then
+	sudo -u $USER "$@"
+	local result="$?"
+    else
+	"$@"
+	local result="$?"
+    fi
+
+    return "$result"
+}
+
+
+# DIALOG -- display a dialog and return the button pressed
+function dialog {  # VAR MESSAGE TITLE ICON (if starts with | try app icon first) BUTTON1 BUTTON2 BUTTON3 (+ = default, - = cancel)
+
+    if [[ "$ok" ]] ; then
+
+	local var="$1" ; shift ; [[ "$var" ]] || var=var  # if not capturing, just save dialog text to this local
+	local msg="${1//\"/\\\"}" ; shift
+	local title="${1//\"/\\\"}" ; shift
+	local title_code="$title" ; [[ "$title_code" ]] && title_code="with title \"$title_code\""
+	
+	# build icon code
+	local icon="$1" ; shift
+	local icon_set=
+	local icon_code=
+	if [ "${icon::1}" = "|" ] ; then
+	    icon="${icon:1}"
+	    [[ ! "$icon" =~ ^stop|caution|note$ ]] && icon=caution
+	    icon_set="set myIcon to (POSIX file \"$myPath/Contents/Resources/$CFBundleIconFile\")
+tell application \"Finder\"
+    if (not exists myIcon) or ((the name extension of (myIcon as alias)) is not \"icns\") then
+        set myIcon to $icon
+    end if
+end tell"
+	else
+	    [[ "$icon" =~ ^stop|caution|note$ ]] && icon_set="set myIcon to $icon"
+	fi
+	[[ "$icon_set" ]] && icon_code='with icon myIcon'
+	
+	# build button list
+	local buttonlist=
+	local button=
+	local button_default=
+	local button_cancel=
+	local try_start=
+	local try_end=
+	local numbuttons=0
+	
+	for button in "$@" ; do
+	    # increment button count
+	    numbuttons=$((${numbuttons} + 1))
+	    
+	    # identify default and cancel buttons
+	    if [[ "${button::1}" = "+" ]] ; then
+		button="${button:1}"
+		button_default="default button \"$button\""
+	    elif [[ ( "${button::1}" = "-" ) || ( "$button" = "Cancel" ) ]] ; then
+		button="${button#-}"
+		button_cancel="cancel button \"$button\""
+		try_start="try"
+		try_end="on error number -128
+    \"$button\"
+end try"
+	    fi
+	    
+	    # add to button list
+	    buttonlist="$buttonlist, \"$button\""
+	done
+	
+	# if no buttons specified, make one default OK button
+	if [[ "$numbuttons" -eq 0 ]]; then
+	    numbuttons=1
+	    button='OK'
+	    button_default="default button \"$button\""
+	    buttonlist=", \"$button\""
+	fi
+	
+	# close button list
+	buttonlist="{ ${buttonlist:2} }"
+
+	# run the dialog
+	
+	try "${var}=" osascript -e "$icon_set
+$try_start
+    button returned of (display dialog \"$msg\" $title_code $icon_code buttons $buttonlist $button_default $button_cancel)
+$try_end" 'Unable to display dialog box!'
+
+	# dialog failure -- if this is an alert, fallback to basic alert
+	if [[ ! "$ok" && ("$numbuttons" = 1) ]] ; then
+	    # dialog failed, try an alert
+	    ok=1
+	    
+	    # display simple alert with fallback icon
+	    [[ "$icon" ]] && icon="with icon $icon"
+	    osascript -e "display alert \"$msg\" $icon buttons {\"OK\"} default button \"OK\" $title_code" > /dev/null 2>&1
+	    
+	    if [[ "$?" != 0 ]] ; then
+		# alert failed too!
+		echo "Unable to display alert with message: $msg" 1>&2
+		ok=
+	    fi
+	fi
+    fi
+    
+    [[ "$ok" ]] && return 0
+    return 1
+}
+
+
+# ALERT -- display a simple alert dialog box (whether ok or not)
+function alert {  #  MESSAGE TITLE ICON (stop, caution, note)
+    local result=
+    
+    # save ok state
+    local oldok="$ok"
+    local olderrmsg="$errmsg"
+    ok=1
+    errmsg=
+
+    # show the alert
+    dialog '' "$1" "$2" "$3"
+    result="$?"
+    
+    # add new error message or restore old one
+    if [[ "$olderrmsg" && "$errmsg" ]] ; then
+	errmsg="$olderrmsg Also: ${errmsg}."
+    elif [[ "$olderrmsg" ]] ; then
+	errmsg="$olderrmsg"
+    fi
+    
+    # if ok was off or we turned it off, turn it off
+    [[ "$oldok" ]] || ok="$oldok"
+    
+    return "$result"
+}
+
+
+# AUTHENTICATE -- relaunch authenticated if necessary
+isAuthenticated=
+function authenticate {  # ID PREAMBLE MESSAGE NONFATAL (If NONFATAL exists, return 1 on auth fail)
+    
+    # only run if no error
+    if [[ "$ok" ]]; then
+	
+	# get ID of this authentication to pass to self
+	local id="$1"
+	shift
+	[[ "$id" ]] || id="admin"
+	
+	# build preamble
+	local preamble="$1"
+	shift
+	[[ "$preamble" ]] && preamble="$preamble "
+	
+	# build alert message
+	local msg="$1"
+	shift
+	[[ ! "$msg" ]] && msg="update"
+	
+	# get nonfatal argument
+	local nonfatal="$1"
+	
+	# only check if we're not already authenticated
+	if [[ ! "$isAuthenticated" ]] ; then
+	    
+	    # try to touch the app bundle--if we can, we have the privileges we need
+	    cmdtext=$(/usr/bin/touch "$myPath" 2>&1)
+	    
+	    if [[ "$?" != 0 ]] ; then
+
+		local doAuth=
+		errre='Permission denied$'
+		if [[ ! "$cmdtext" =~ $errre ]] ; then
+		    
+		    # some other error (not permission denied)
+		    msg="Error attempting to determine if authentication is required."
+		    
+		    if [[ "$nonfatal" ]] ; then
+			alert "$msg" 'Warning' '|caution'
+		    else
+			abort "$msg" 1
+		    fi
+		else
+		    
+		    # permission denied to touch this file--ask to authenticate
+		    dialog doAuth "${preamble}In order to $msg, the app must run with administrator privileges." "Authentication Required" "|caution" "Authenticate" "+Cancel"
+		    
+		    # user wants to authenticate
+		    if [[ "$doAuth" = "Authenticate" ]] ; then
+			
+			# replace ourself with an authenticated version
+			#of the same script running with admin privileges
+			#exec osascript -e 'do shell script "su -m '"$USER"' -c \"" & (quoted form of "'"${0//\"/\\\\\\\"}"'") & "\"" with administrator privileges'
+			exec osascript -e 'do shell script (quoted form of "'"$0"'") & " " & (quoted form of "'"$id"'") with administrator privileges'
+			
+		    elif [[ "$nonfatal" ]] ; then
+			return 1
+		    else
+			abort "Please relaunch with administrator privileges." 1
+		    fi
+		fi
+	    else
+		isAuthenticated=1
+	    fi
+	fi
+    fi
+    
+    # all went well, we are authenticated!
+    [[ "$ok" ]] && return 0
+    return 1
+}
+
+
+# COMMAND-LINE VARIABLES
+
+isAdmin="$1"
+
+# BOOTSTRAP RUNTIME SCRIPT
+
+# determine location of runtime script
+myPath=$(cd "$(dirname "$0")/../.."; pwd)
+myContents="$myPath/Contents"
+[[ $? != 0 ]] && abort 'Unable to determine app path.' 1
+[[ "$myPath" =~ \.[aA][pP][pP]$ ]] || abort 'Unexpected app path.' 1
+
+# load main runtime functions
+source "${myContents}/Resources/Scripts/runtime.sh"
+[[ $? != 0 ]] && abort 'Unable to load runtime script.' 1
+
+
+# GET BASIC APP INFORMATION
+
+# load config.sh file
+safesource "$myContents/$appConfigScript" "config file"
+
+if [[ "$ok" && ! ( "$CFBundleIdentifier" && "$SSBVersion" && "$SSBProfilePath" ) ]] ; then
+    ok=
+    errmsg='Config file is corrupt.'
+fi
+
+# abort on error, since next command is non-fatal
+[[ "$ok" ]] || abort "$errmsg" 1
+
+# get info on current Epichrome version
+mcssbinfo
+if [[ ! "$ok" ]] ; then
+    # fail silently, and we just won't check for updates
+    ok=1 ; errmsg=
+fi
+
+# get absolute profile path
+if [[ "$(isarray SSBProfilePath)" ]] ; then
+    myProfilePath="${SSBProfilePath[0]}"
+else
+    myProfilePath="$SSBProfilePath"
+fi
+myProfilePath="${HOME}/$SSBProfilePath"
+
+# by default we don't need to update the config file
+updateconfig=
+
+
+# CHECK FOR NEW VERSION OF EPICHROME AND UPDATE
+
+if [[ "$(newversion "$SSBVersion" "$mcssbVersion")" ]] ; then
+
+    # update message
+    updatemsg="A new version of the Epichrome runtime was found ($mcssbVersion)."
+    
+    # authenticate
+    authenticate mcssbupdate "$updatemsg" 'update' nonfatal
+    if [[ "$?" = 0 ]] ; then
+	
+	# Ask about updating (unless we asked with the authentication dialog)
+	if [[ "$isAdmin" != mcssbupdate ]] ; then
+	    dialog doUpdate \
+		   "A new version of the Epichrome runtime was found ($mcssbVersion). Would you like to update now?" \
+		   "Update" \
+		   "|caution" \
+		   "+Update" \
+		   "-Later" \
+		   "Don't Ask Again For This Version"
+	    if [[ ! "$ok" ]] ; then
+		alert "A new version of the Epichrome runtime was found ($mcssbVersion) but update dialog failed. Attempting to update now." 'Update' '|caution'
+		doUpdate="Update"
+		ok=1
+		errmsg=
+	    fi
+	else
+	    doUpdate="Update"
+	fi
+	
+	if [[ "$ok" ]] ; then
+	    
+	    # act based on dialog
+	    case "$doUpdate" in
+		Update)
+
+		    # read in the new runtime
+		    safesource "${mcssbPath}/Contents/Resources/Runtime/Resources/Scripts/runtime.sh" "updated runtime script"
+		    
+		    # use new runtime to update the SSB (and relaunch)
+		    updatessb "$myPath"
+		    
+		    ;;
+		Later)
+		    # don't update
+		    doUpdate=
+		    ;;
+		*)
+		    # pretend we're already at the new version
+		    SSBVersion="$mcssbVersion"
+		    updateconfig=1
+		    ;;
+	    esac
+	fi
+	
+	# alert the user to any error, but don't abort
+	if [[ ! "$ok" ]] ; then
+	    alert "$errmsg Please try update again later." 'Unable to Update' '|caution'
+	    ok=1
+	fi
+    fi
+fi
+
+
+# CHECK FOR A NEW VERSION OF EPICHROME ON GITHUB
+
+try 'curDate=' /bin/date '+%s' 'Unable to get date for Epichrome update check.'
+if [[ "$ok" ]] ; then
+    
+    # check for updates if we've never run a check, or if the next check date is in the past
+    if [[ ( ! "$SSBUpdateCheckDate" ) || ( "$SSBUpdateCheckDate" -lt "$curDate" ) ]] ; then
+
+	# set next update for 7 days from now
+	SSBUpdateCheckDate=$(($curDate + (7 * 24 * 60 * 60)))
+	updateconfig=1
+	
+	# if we haven't set a version to check against, use the current version
+	[[ "$SSBUpdateCheckVersion" ]] || SSBUpdateCheckVersion="$mcssbVersion"
+
+	# check if there's a new version on Github
+	try 'updateResult=' checkmcssbversion "$myContents" "$SSBUpdateCheckVersion" 'Unable to check for a new version of Epichrome on Github.'
+	if [[ ! "$ok" ]] ; then
+	    alert "Warning: $errmsg" 'Checking For Update' '|caution'
+	    ok=1
+	else
+
+	    # if there's an update available, display a dialog
+	    if [[ "$updateResult" ]] ; then
+		# set separator to newline
+		oldifs="$IFS"
+		IFS=$'\n'
+
+		# convert result into an array
+		updateResult=( $(echo "$updateResult") )
+
+		# display dialog
+		dialog doEpichromeUpdate \
+		   "A new version of Epichrome (${updateResult[0]}) is available on GitHub." \
+		   "Update Available" \
+		   "|caution" \
+		   "+Download" \
+		   "-Later" \
+		   "Ignore This Version"
+		
+		# act based on dialog
+		if [[ "$ok" ]] ; then
+		    
+		    case "$doEpichromeUpdate" in
+			Download)
+			    # open the update URL
+			    open "${updateResult[1]}"
+			    ;;
+			
+			Later)
+			    # do nothing
+			    doEpichromeUpdate=
+			    ;;
+			*)
+			    # pretend we're already at the new version
+			    SSBUpdateCheckVersion="${updateResult[0]}"
+			    ;;
+		    esac
+		fi
+		
+		# alert the user to any error, but don't abort
+		if [[ ! "$ok" ]] ; then
+		    alert "Warning: $errmsg" 'Checking For Update' '|caution'
+		    ok=1
+		fi
+		
+		IFS="$oldifs"
+	    fi
+	fi
+    fi
+fi
+
+
+# CHECK AND UPDATE CHROME LINKS
+
+# get Google Chrome info
+chromeinfo
+
+# we've done a bunch of stuff--abort if any of it has gone wrong
+[[ "$ok" ]] || abort "$errmsg" 1
+
+# update config variable
+if [ "$SSBChromePath" != "$chromePath" ] ; then
+    
+    authenticate chromepath '' '' nonfatal
+    
+    if [[ "$?" = 0 ]] ; then
+	SSBChromePath="$chromePath"
+	updateconfig=1
+    fi
+fi
+
+# check if the Chrome engine executable is either:
+# not a link; not executable; or not pointing to the real Chrome executable
+myChromeExec="$myContents/$appChromeEngine/$engineExec"
+if [[ ( ! -h "$myChromeExec" ) || \
+	  ( ! -x "$myChromeExec" ) || \
+	  ( "$chromeExec" != "$(readlink "$myChromeExec" 2> /dev/null)" ) ]] ; then
+
+    # (note that readlink can fail silently--all it means is we'll do the update
+
+    # basic relink message
+    updatemsg='Google Chrome appears to have moved.'
+    
+    # authenticate
+    authenticate relink "$updatemsg" "relink"
+    
+    # display a relink alert if we didn't just become admin
+    if [[ "$isAdmin" != relink ]] ; then
+	alert "$updatemsg Attempting to relink..." 'Relinking Chrome' '|caution'
+    fi
+    
+    # relink to Google Chrome engine
+    linkchrome "$myContents"
+    
+    # abort if we failed to relink Chrome
+    [[ "$ok" ]] || abort "$errmsg" 1
+fi
+
+# check for new version of Chrome and update
+if [ "$SSBChromeVersion" != "$chromeVersion" ] ; then
+
+    updatemsg="New version of Google Chrome found ($chromeVersion)."
+
+    # authenticate
+    authenticate chromeupdate "$updatemsg" 'update' nonfatal
+    if [[ "$?" = 0 ]] ; then
+	
+	# display a Chrome update alert if we didn't just become admin
+	if [[ "$isAdmin" != chromeupdate ]] ; then
+	    alert "$updatemsg Updating app..." 'New Chrome Version' '|caution'
+	fi
+	
+	# set new version number for config file
+	SSBChromeVersion="$chromeVersion"
+	
+	# use new runtime to update the SSB (and relaunch)
+	updatessb "$myPath" '' ChromeOnly
+	
+    else
+	ok=
+	errmsg="Permission denied."
+    fi
+
+    # failure is non-fatal
+    if [[ ! "$ok" ]] ; then
+	alert "Unable to update app to new version of Google Chrome. ($errmsg) It may or may not run properly." 'Warning' '|caution'
+	ok=
+	errmsg=
+    fi
+fi
+
+
+# HANDLE FIRST-RUN SETUP
+
+newprofile=
+if [[ "$SSBFirstRunSinceVersion" ]]; then
+
+    # UPDATE PROFILE PATH
+    
+    # check if we're migrating profile paths
+    if [[ "$(isarray SSBProfilePath)" ]] ; then
+	
+	# get old path info
+	oldProfilePath="${SSBProfilePath[1]}"
+	
+	# get absolute path if necessary
+	[[ "${oldProfilePath:0:1}" = "/" ]] || oldProfilePath="${HOME}/$oldProfilePath"
+
+	# get the base directory
+	oldProfileBase="${oldProfilePath%/*}"
+	
+	# if there's a profile in the old location, try to move it
+	if [[ -d "$oldProfilePath" ]] ; then
+	    if [[ -e "$myProfilePath" && ! -d "$myProfilePath" ]]; then
+		# found something other than a directory, get rid of it
+		try rm -f "$myProfilePath" 'Unable to clean up new profile location.'
+		[[ "$ok" ]] || abort "Can't create profile folder. $errmsg" 1
+	    fi
+	    
+	    if [[ ! -d "$myProfilePath" ]]; then
+		
+		# old profile exists, new one doesn't, so create it
+		newprofile=1
+		try 'profileBase=' dirname "$myProfilePath" 'Unable to get path to profile folder.'
+		try unsudo mkdir -p "$profileBase" 'Unable to create profile folder.'
+		try mv -f "$oldProfilePath" "$myProfilePath" 'Unable to move profile folder from old location.'
+		if [[ ! "$ok" ]] ; then
+		    alert "Warning: $errmsg You may lose your settings." 'Updating Profile' '|caution'
+		    ok=1
+		fi
+	    else
+		# profile directories in both places! throw up hands
+		alert 'Warning: Profiles exist in both new and old locations. Your old profile will be ignored.' 'Multiple Profiles' '|caution'
+	    fi
+	fi
+	
+	# if we've emptied out the old profile base folder, get rid of it (not important, so fail silently)
+	rm -f "${oldProfileBase}/.DS_Store" > /dev/null 2>&1
+	foob="$(rmdir "$oldProfileBase"  2>&1)"
+	
+	# update profile path to be a single entry now that we're done migrating
+	tempProfilePath="${SSBProfilePath[0]}"
+	unset SSBProfilePath
+	SSBProfilePath="$tempProfilePath"
+	updateconfig=1
+    fi
+fi
+
+
+# CREATE PROFILE FOLDER IF IT DOESN'T ALREADY EXIST
+
+# create profile folder
+if [[ ! -d "$myProfilePath" ]]; then
+    newprofile=1
+    try unsudo mkdir -p "$myProfilePath" 'Unable to create profile folder.'
+    [[ "$ok" ]] || abort "$errmsg" 1
+fi
+
+# set First Run file so Chrome doesn't think it's new (fail silently)
+firstrunfile="${myProfilePath}/First Run"
+[[ -e "$firstrunfile" ]] || unsudo touch "$firstrunfile" > /dev/null 2>&1
+
+
+# MOVE EXTENSION-INSTALLATION SCRIPT INTO PLACE
+    
+if [[ "$SSBFirstRunSinceVersion" || "$newprofile" ]]; then
+    
+    # set up useful variables
+    extDir="External Extensions"
+    extSourcePath="$myContents/Resources/$extDir"
+    extDestPath="$myProfilePath/$extDir"
+    
+    extDoCopy=
+    
+    # make sure the extension install source folder exists
+    if [[ ! -d "$extSourcePath" ]] ; then
+	ok=
+	errmsg='No source directory found.'
+    fi
+    
+    # get a listing of the source directory
+    dirlist "$extSourcePath" extSourceList 'source directory'
+    
+    # check if the source directory is empty
+    if [[ "$ok" && ( ! "${extSourceList[*]}" ) ]]; then
+	ok=
+	errmsg='The source directory is empty.'
+    fi
+    
+    # check if the destination directory exists
+    if [[ "$ok" ]] ; then
+	if [[ -e "$extDestPath" && ! -d "$extDestPath" ]]; then
+	    # found something other than a directory, get rid of it
+	    try rm -f "$extDestPath" 'Unable to clean up destination directory.'
+	fi
+	
+	if [[ "$ok" && ! -d "$extDestPath" ]] ; then
+	    # no destination directory
+	    extDoCopy=1
+	else
+	    # get a listing of the destination directory
+	    dirlist "$extDestPath" extDestList 'destination directory'
+	    
+	    # compare source and destination directories
+	    if [[ "$ok" && ( "${extSourceList[*]}" != "${extDestList[*]}" ) ]] ; then
+		extDoCopy=1
+	    fi
+	fi
+    fi
+    
+    # if for any reason we need to copy the install directory, do it now
+    if [[ "$ok" && "$extDoCopy" ]] ; then
+	unsudo safecopy "$extSourcePath" "$extDestPath" 'installation directory'
+    fi
+    
+    # report error, but don't abort
+    if [[ ! "$ok" ]] ; then
+	# show warning alert
+	alert "Can't install \"Epichrome Helper\" extension. ($errmsg) Your app will still work, but if you want to use the extension, you'll have to install it manually." 'Extension Install Error' '|caution'
+
+	# clear error state
+	ok=1 ; errmsg=
+    fi    
+fi
+
+	
+# MAKE SURE NATIVE HOST IS INSTALLED
+
+if [[ ! "$SSBHostInstallError" ]]; then
+    
+    # set up host file paths
+    hostId="org.epichrome.helper"
+    hostManifest="${hostId}.json"
+    hostScript="${hostId}-host.py"
+    hostDir="NativeMessagingHosts"
+    hostInstallPath="$myProfilePath/$hostDir"
+    hostScriptInstalled="$hostInstallPath/$hostScript"
+    hostManifestInstalled="$hostInstallPath/$hostManifest"
+
+    # check if we need to install native messaging host
+    doHostInstall=
+        
+    # do it if we just updated, or the host script or manifest don't exist
+    if [[ "$SSBFirstRunSinceVersion" || \
+		( ! -x "$hostScriptInstalled" ) || \
+		( ! -e "$hostManifestInstalled" ) ]] ; then
+	doHostInstall=1
+    else
+	# get installed host version if possible
+	try 'hostVersion=' "$hostScriptInstalled" -v ''
+	if [[ ! "$ok" ]] ; then
+	    hostVersion=0.0.0
+	    ok=1 ; errmsg=
+	fi
+	
+	# if installed host is old, we'll update it
+	[[ $(newversion "$hostVersion" "$mcssbVersion") ]] && doHostInstall=1
+    fi
+    
+    # make sure the manifest points to the current path of the script
+    if [[ ! "$doHostInstall" ]] ; then
+	
+	# get path to script in the manifest
+	try 'oldHostScriptInstalled=' sed -En 's/^.*"path": "(.*)",[ ]*(\/\/.*)?$/\1/p' "$hostManifestInstalled" \
+	    'Unable to get current host script path'
+	
+	# on error, or if the paths don't match, reinstall
+	if [[ ! "$ok" || ("$oldHostScriptInstalled" != "$hostScriptInstalled") ]] ; then
+	    ok=1 ; errmsg=
+	    doHostInstall=1
+	fi
+    fi
+    
+    # do the installation if necessary
+    if [[ "$doHostInstall" ]] ; then
+	
+	hostSourcePath="$myContents/Resources/$hostDir"
+	
+	# create the install directory
+	try unsudo /bin/mkdir -p "$hostInstallPath" 'Unable to create installation folder.'
+	
+	# stream-edit the manifest file
+	hostManifestTmp=$(tempname "$hostManifestInstalled")
+	try unsudo /usr/bin/touch "${hostManifestTmp}" 'Unable to create manifest.'
+	try "${hostManifestTmp}<" sed "s/SSBHOSTPATH/${hostScriptInstalled//\//\\/}/" "$hostSourcePath/$hostManifest" 'Unable to copy manifest.'
+	
+	# stream-edit the host script
+	hostScriptTmp=$(tempname "$hostScriptInstalled")
+	try unsudo /usr/bin/touch "${hostScriptTmp}" 'Unable to create script.'
+	try "${hostScriptTmp}<" sed "s/SSBID/$CFBundleIdentifier/; s/SSBNAME/$CFBundleDisplayName/; s/SSBSHORTNAME/$CFBundleName/;" "$hostSourcePath/$hostScript" 'Unable to copy script.'
+	
+	# fix host script permissions
+	try /bin/chmod 755 "$hostScriptTmp" 'Unable to make script executable.'
+	
+	# move both files to permanent homes
+	permanent "$hostManifestTmp" "$hostManifestInstalled" 'manifest'
+	permanent "$hostScriptTmp" "$hostScriptInstalled" 'script'
+	
+	# report error, but don't abort
+	if [[ ! "$ok" ]] ; then
+	    # remove temporary files
+	    [[ -e "$hostManifestTmp" ]] && rmtemp "$hostManifestTmp" 'manifest'
+	    [[ -e "$hostScriptTmp" ]] && rmtemp "$hostScriptTmp" 'script'
+	    
+	    # set error state
+	    SSBHostInstallError=1
+	    updateconfig=1
+	    
+	    # show an alert
+	    alert "Unable to install native messaging host. ($errmsg) The SSB will still work, but the companion \"Epichrome Helper\" extension won't." 'Messaging Host Install Error' '|caution'
+	    
+	    # clear error state (non-fatal)
+	    ok=1
+	    errmsg=
+	fi
+    fi
+fi
+
+
+# UPDATE CONFIG FILE IF NECESSARY
+
+if [[ "$SSBFirstRunSinceVersion" ]] ; then
+
+    # authenticate (fail to run otherwise)
+    authenticate firstrun '' 'run for the first time'
+    
+    # update config file to signal no longer first run
+    SSBFirstRunSinceVersion=
+    updateconfig=1
+fi
+
+if [ "$updateconfig" ] ; then
+
+    # failsafe -- we should never get here without already authenticating
+    authenticate updateconfig '' 'update configuration'
+    
+    writeconfig "$myContents"
+    [[ "$ok" ]] || abort "$errmsg" 1
+fi
+
+
+# LAUNCH THE SSB
+
+myCommand=("$myChromeExec" --user-data-dir="$myProfilePath" "${SSBCommandLine[@]}")
+
+if [[ "$isAdmin" ]] ; then
+    # we're running as admin, so launch the SSB as the original user
+    #exec sudo -u $USER "${myCommand[@]}"
+    exec sudo -u $USER open "$myPath"
+else
+    exec "${myCommand[@]}"
+fi

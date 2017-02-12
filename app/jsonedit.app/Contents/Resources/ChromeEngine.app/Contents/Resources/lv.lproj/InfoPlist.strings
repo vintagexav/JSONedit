@@ -1,0 +1,5 @@
+CFBundleDisplayName = "jsonedit";
+CFBundleGetInfoString = "Google Chrome 56.0.2924.87, Autortiesības 2017 Google Inc. Visas tiesības paturētas.";
+CFBundleName = "jsonedit";
+NSContactsUsageDescription = "Izmantojot datus no savas kontaktinformācijas, pārlūkā Chrome varat ērtāk aizpildīt veidlapas.";
+NSHumanReadableCopyright = "Autortiesības 2017 Google Inc. Visas tiesības paturētas.";

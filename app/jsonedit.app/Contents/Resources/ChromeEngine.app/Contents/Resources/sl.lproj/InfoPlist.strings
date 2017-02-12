@@ -1,0 +1,5 @@
+CFBundleDisplayName = "jsonedit";
+CFBundleGetInfoString = "Google Chrome 56.0.2924.87, Copyright 2017 Google Inc. Vse pravice pridržane.";
+CFBundleName = "jsonedit";
+NSContactsUsageDescription = "S podatki iz stikov lahko hitreje izpolnjujete obrazce v Chromu.";
+NSHumanReadableCopyright = "Copyright 2017 Google Inc. Vse pravice pridržane.";

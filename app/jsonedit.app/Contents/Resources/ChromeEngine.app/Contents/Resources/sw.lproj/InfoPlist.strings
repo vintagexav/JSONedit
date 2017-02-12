@@ -1,0 +1,5 @@
+CFBundleDisplayName = "jsonedit";
+CFBundleGetInfoString = "Google Chrome 56.0.2924.87, Hakimiliki 2017 Google Inc. Haki zote zimehifadhiwa.";
+CFBundleName = "jsonedit";
+NSContactsUsageDescription = "Maelezo kutoka kwa anwani zako yanaweza kukusaidia kujaza fomu kwa haraka zaidi katika Chrome.";
+NSHumanReadableCopyright = "Hakimiliki 2017 Google Inc. Haki zote zimehifadhiwa.";
